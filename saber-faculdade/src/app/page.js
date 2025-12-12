@@ -1,809 +1,440 @@
 'use client';
 
-import { useState } from 'react';
+import { useDisciplinas } from '@/hooks/useDisciplinas';
+import Header from '@/components/Header';
+import DisciplinaCard from '@/components/DisciplinaCard';
+import Loading from '@/components/Loading';
+import ErrorMessage from '@/components/ErrorMessage';
 
-export default function SaberPlus() {
-  const [busca, setBusca] = useState('');
-  const [telaAtual, setTelaAtual] = useState('home'); // 'home', 'materia' ou 'conta'
-  const [materiaAtual, setMateriaAtual] = useState(null);
+export default function Home() {
+  const { data: disciplinas, loading, error } = useDisciplinas();
 
-  // Dados das matérias com vídeos e livros
-  const materias = {
-    'Matemática': {
-      cor: 'linear-gradient(135deg, #1a4d0f, #2d5016)',
-      icone: '∑ π',
-      videos: [
-        { titulo: 'Conjuntos numéricos', imagem: '🔢' },
-        { titulo: 'Função', imagem: '📊' },
-        { titulo: 'Geometria Plana', imagem: '📐' }
-      ],
-      livros: [
-        { titulo: 'Funções Matemática', capa: '📘' },
-        { titulo: 'Conjuntos Numéricos', capa: '📗' },
-        { titulo: 'Matemática Ensino Médio', capa: '📕' },
-        { titulo: 'Geometria Plana', capa: '📙' },
-        { titulo: 'Funções - Teoria', capa: '📔' },
-        { titulo: 'Geometria Espacial', capa: '📓' },
-        { titulo: 'Conjuntos Avançados', capa: '📒' },
-        { titulo: 'Funções Compostas', capa: '📖' }
-      ]
-    },
-    'Química': {
-      cor: 'linear-gradient(135deg, #ff8c1a, #ffaa44)',
-      icone: '⚗️',
-      videos: [
-        { titulo: 'Tabela Periódica', imagem: '🧪' },
-        { titulo: 'Reações Químicas', imagem: '⚗️' },
-        { titulo: 'Química Orgânica', imagem: '🔬' }
-      ],
-      livros: [
-        { titulo: 'Química Geral', capa: '📘' },
-        { titulo: 'Química Orgânica', capa: '📗' },
-        { titulo: 'Reações Químicas', capa: '📕' },
-        { titulo: 'Tabela Periódica', capa: '📙' }
-      ]
-    },
-    'Português': {
-      cor: 'linear-gradient(135deg, #003366, #0052a3)',
-      icone: 'PT',
-      videos: [
-        { titulo: 'Gramática', imagem: '📝' },
-        { titulo: 'Literatura', imagem: '📚' },
-        { titulo: 'Redação', imagem: '✍️' }
-      ],
-      livros: [
-        { titulo: 'Gramática Completa', capa: '📘' },
-        { titulo: 'Literatura Brasileira', capa: '📗' },
-        { titulo: 'Redação ENEM', capa: '📕' }
-      ]
-    },
-    'Artes': {
-      cor: 'linear-gradient(135deg, #6b8e6f, #87a988)',
-      icone: '🎨',
-      videos: [
-        { titulo: 'História da Arte', imagem: '🖼️' },
-        { titulo: 'Teoria das Cores', imagem: '🎨' }
-      ],
-      livros: [
-        { titulo: 'História da Arte', capa: '📘' },
-        { titulo: 'Artes Visuais', capa: '📗' }
-      ]
-    },
-    'Inglês': {
-      cor: 'white',
-      icone: '🇬🇧',
-      videos: [
-        { titulo: 'Gramática Inglesa', imagem: '📖' },
-        { titulo: 'Vocabulário', imagem: '📚' }
-      ],
-      livros: [
-        { titulo: 'English Grammar', capa: '📘' },
-        { titulo: 'Vocabulary Builder', capa: '📗' }
-      ]
-    },
-    'Educação Física': {
-      cor: 'linear-gradient(135deg, #002855, #003d7a)',
-      icone: '⛹️',
-      videos: [
-        { titulo: 'Esportes Coletivos', imagem: '⚽' },
-        { titulo: 'Nutrição Esportiva', imagem: '🥗' }
-      ],
-      livros: [
-        { titulo: 'Educação Física', capa: '📘' },
-        { titulo: 'Nutrição', capa: '📗' }
-      ]
-    },
-    'Biologia': {
-      cor: 'linear-gradient(135deg, #4a7c2a, #6b9d3f)',
-      icone: '🧬',
-      videos: [
-        { titulo: 'Citologia', imagem: '🔬' },
-        { titulo: 'Ecologia', imagem: '🌍' }
-      ],
-      livros: [
-        { titulo: 'Biologia Celular', capa: '📘' },
-        { titulo: 'Ecossistemas', capa: '📗' }
-      ]
-    }
-  };
+  const destaques = disciplinas.filter(d => d.categoria === 'destaque');
+  const adicionais = disciplinas.filter(d => d.categoria === 'adicional');
 
-  function abrirMateria(nome) {
-    setMateriaAtual(nome);
-    setTelaAtual('materia');
-  }
-
-  function voltarHome() {
-    setTelaAtual('home');
-    setMateriaAtual(null);
-  }
-
-  function abrirConta() {
-    setTelaAtual('conta');
-  }
-
-  function buscar() {
-    if (busca) {
-      alert('Buscando: ' + busca);
-    }
-  }
-
-  // TELA MINHA CONTA
-  if (telaAtual === 'conta') {
-    return (
-      <div>
-        <style jsx global>{`
-          body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #fafafa;
-          }
-          .tela-conta {
-            min-height: 100vh;
-            background-color: #fafafa;
-          }
-          .cabecalho-conta {
-            background-color: white;
-            padding: 20px 40px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            border-bottom: 1px solid #ddd;
-          }
-          .botao-voltar {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #0066cc;
-          }
-          .logo-pequeno {
-            font-size: 20px;
-            font-weight: bold;
-            color: #0066cc;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-          }
-          .titulo-materia {
-            font-size: 28px;
-            font-weight: bold;
-            color: #0066cc;
-            margin-left: auto;
-          }
-          .container-conta {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 0 20px;
-          }
-          .card-perfil {
-            background: white;
-            border-radius: 15px;
-            padding: 40px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-            text-align: center;
-          }
-          .foto-perfil-grande {
-            width: 120px;
-            height: 120px;
-            background: linear-gradient(135deg, #0066cc, #004999);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 50px;
-            color: white;
-            margin: 0 auto 20px;
-          }
-          .nome-usuario {
-            font-size: 28px;
-            color: #333;
-            margin-bottom: 5px;
-            font-weight: bold;
-          }
-          .email-usuario {
-            color: #666;
-            font-size: 16px;
-          }
-          .card-info {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-          }
-          .titulo-secao-conta {
-            font-size: 20px;
-            color: #0066cc;
-            margin-bottom: 20px;
-            font-weight: bold;
-          }
-          .item-info {
-            display: flex;
-            justify-content: space-between;
-            padding: 15px 0;
-            border-bottom: 1px solid #f0f0f0;
-          }
-          .item-info:last-child {
-            border-bottom: none;
-          }
-          .label-info {
-            color: #666;
-            font-weight: 500;
-          }
-          .valor-info {
-            color: #333;
-            font-weight: bold;
-          }
-          .botao-sair {
-            width: 100%;
-            padding: 15px;
-            background: #ff4444;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-          }
-          .botao-sair:hover {
-            background: #cc0000;
-            transform: translateY(-2px);
-          }
-        `}</style>
-
-        <div className="tela-conta">
-          <div className="cabecalho-conta">
-            <button className="botao-voltar" onClick={voltarHome}>
-              ← 
-            </button>
-            <div className="logo-pequeno">
-              📚 Saber+
-            </div>
-            <div className="titulo-materia">
-              Minha Conta
-            </div>
-          </div>
-
-          <div className="container-conta">
-            <div className="card-perfil">
-              <div className="foto-perfil-grande">👤</div>
-              <h2 className="nome-usuario">Pedro Silva</h2>
-              <p className="email-usuario">pedro.silva@email.com</p>
-            </div>
-
-            <div className="card-info">
-              <h3 className="titulo-secao-conta">Informações Pessoais</h3>
-              <div className="item-info">
-                <span className="label-info">Nome Completo</span>
-                <span className="valor-info">Pedro Silva</span>
-              </div>
-              <div className="item-info">
-                <span className="label-info">Email</span>
-                <span className="valor-info">pedro.silva@email.com</span>
-              </div>
-              <div className="item-info">
-                <span className="label-info">Série</span>
-                <span className="valor-info">3º Ano - Ensino Médio</span>
-              </div>
-              <div className="item-info">
-                <span className="label-info">Escola</span>
-                <span className="valor-info">Colégio Estadual</span>
-              </div>
-            </div>
-
-            <div className="card-info">
-              <h3 className="titulo-secao-conta">Estatísticas</h3>
-              <div className="item-info">
-                <span className="label-info">Vídeos Assistidos</span>
-                <span className="valor-info">42</span>
-              </div>
-              <div className="item-info">
-                <span className="label-info">Livros Lidos</span>
-                <span className="valor-info">15</span>
-              </div>
-            </div>
-
-            <button className="botao-sair" onClick={() => alert('Saindo da conta...')}>
-              Sair da Conta
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // TELA DA MATÉRIA (como a imagem que você mostrou)
-  if (telaAtual === 'materia' && materiaAtual) {
-    const materia = materias[materiaAtual];
-    
-    return (
-      <div>
-        <style jsx global>{`
-          body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #fafafa;
-          }
-          .cabecalho-materia {
-            background-color: white;
-            padding: 20px 40px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            border-bottom: 1px solid #ddd;
-          }
-          .botao-voltar {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #0066cc;
-          }
-          .logo-pequeno {
-            font-size: 20px;
-            font-weight: bold;
-            color: #0066cc;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-          }
-          .titulo-materia {
-            font-size: 28px;
-            font-weight: bold;
-            color: #0066cc;
-            margin-left: auto;
-          }
-          .conteudo-materia {
-            padding: 40px;
-          }
-          .secao {
-            margin-bottom: 40px;
-          }
-          .titulo-secao {
-            font-size: 24px;
-            color: #0066cc;
-            margin-bottom: 20px;
-          }
-          .grade-videos {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-          }
-          .card-video {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            cursor: pointer;
-            transition: all 0.3s;
-          }
-          .card-video:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-          }
-          .thumbnail-video {
-            height: 150px;
-            background: ${materia.cor};
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 60px;
-          }
-          .info-video {
-            padding: 15px;
-          }
-          .titulo-video {
-            font-size: 16px;
-            font-weight: bold;
-            color: #333;
-          }
-          .grade-livros {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 20px;
-          }
-          .card-livro {
-            background: white;
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            cursor: pointer;
-            transition: all 0.3s;
-          }
-          .card-livro:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-          }
-          .capa-livro {
-            font-size: 60px;
-            margin-bottom: 10px;
-          }
-          .titulo-livro {
-            font-size: 12px;
-            color: #333;
-            font-weight: bold;
-          }
-          .botao-ver-mais {
-            background: white;
-            border: 2px solid #0066cc;
-            color: #0066cc;
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            margin-top: 10px;
-          }
-          .botao-ver-mais:hover {
-            background: #0066cc;
-            color: white;
-          }
-          .setas-navegacao {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-          }
-          .seta {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: white;
-            border: 2px solid #0066cc;
-            color: #0066cc;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-          }
-          .seta:hover {
-            background: #0066cc;
-            color: white;
-          }
-        `}</style>
-
-        <div className="cabecalho-materia">
-          <button className="botao-voltar" onClick={voltarHome}>
-            ← 
-          </button>
-          <div className="logo-pequeno">
-            📚 Saber+
-          </div>
-          <div className="titulo-materia">
-            {materiaAtual}
-          </div>
-        </div>
-
-        <div className="conteudo-materia">
-          {/* Seção de Vídeos */}
-          <div className="secao">
-            <div className="grade-videos">
-              {materia.videos.map((video, index) => (
-                <div key={index} className="card-video" onClick={() => alert('Abrindo: ' + video.titulo)}>
-                  <div className="thumbnail-video">
-                    {video.imagem}
-                  </div>
-                  <div className="info-video">
-                    <div className="titulo-video">{video.titulo}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Seção de Livros */}
-          <div className="secao">
-            <h3 className="titulo-secao">Por Dentro Do Assunto...</h3>
-            <div className="grade-livros">
-              {materia.livros.map((livro, index) => (
-                <div key={index} className="card-livro" onClick={() => alert('Abrindo: ' + livro.titulo)}>
-                  <div className="capa-livro">{livro.capa}</div>
-                  <div className="titulo-livro">Ver mais...</div>
-                </div>
-              ))}
-            </div>
-            <div className="setas-navegacao">
-              <div className="seta">←</div>
-              <div className="seta">→</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // TELA HOME (página inicial com todos os cards)
   return (
-    <div>
-      <style jsx global>{`
-        body {
-          margin: 0;
-          font-family: Arial, sans-serif;
-          background-color: #fafafa;
+    <>
+      <Header />
+      
+      <main className="main">
+        {/* Hero Section */}
+        <section className="hero">
+          <div className="hero-background"></div>
+          <div className="container hero-content">
+            <div className="hero-badge">✨ Educação Gratuita</div>
+            <h1 className="hero-title">
+              Bem-vindo ao <span className="highlight">Saber+</span>
+            </h1>
+            <p className="hero-subtitle">
+              Sua plataforma completa de estudos com aulas gratuitas em vídeo
+            </p>
+            <div className="hero-stats">
+              <div className="stat-item">
+                <div className="stat-number">{disciplinas.length}+</div>
+                <div className="stat-label">Disciplinas</div>
+              </div>
+              <div className="stat-divider"></div>
+              <div className="stat-item">
+                <div className="stat-number">100%</div>
+                <div className="stat-label">Grátis</div>
+              </div>
+              <div className="stat-divider"></div>
+              <div className="stat-item">
+                <div className="stat-number">HD</div>
+                <div className="stat-label">Qualidade</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div className="container">
+          {loading && (
+            <div className="loading-wrapper">
+              <Loading message="Carregando disciplinas..." />
+            </div>
+          )}
+          
+          {error && (
+            <div className="error-wrapper">
+              <ErrorMessage message={error} />
+            </div>
+          )}
+
+          {!loading && !error && (
+            <>
+              {/* Destaques Section */}
+              <section className="section">
+                <div className="section-header">
+                  <div className="section-icon">📌</div>
+                  <div>
+                    <h2 className="section-title">Destaques</h2>
+                    <p className="section-description">As disciplinas mais populares</p>
+                  </div>
+                </div>
+                <div className="cards-grid">
+                  {destaques.map(disciplina => (
+                    <DisciplinaCard 
+                      key={disciplina.id} 
+                      disciplina={disciplina} 
+                    />
+                  ))}
+                </div>
+              </section>
+
+              {/* Veja Também Section */}
+              <section className="section">
+                <div className="section-header">
+                  <div className="section-icon">🎓</div>
+                  <div>
+                    <h2 className="section-title">Veja Também</h2>
+                    <p className="section-description">Explore mais conteúdos</p>
+                  </div>
+                </div>
+                <div className="cards-grid">
+                  {adicionais.map(disciplina => (
+                    <DisciplinaCard 
+                      key={disciplina.id} 
+                      disciplina={disciplina} 
+                    />
+                  ))}
+                </div>
+              </section>
+            </>
+          )}
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="footer">
+        <div className="container">
+          <div className="footer-content">
+            <div className="footer-brand">
+              <h3>📚 Saber+</h3>
+              <p>Educação de qualidade e gratuita para todos</p>
+            </div>
+            <div className="footer-links">
+              <div className="footer-column">
+                <h4>Plataforma</h4>
+                <a href="#sobre">Sobre</a>
+                <a href="#disciplinas">Disciplinas</a>
+                <a href="#contato">Contato</a>
+              </div>
+              <div className="footer-column">
+                <h4>Suporte</h4>
+                <a href="#ajuda">Ajuda</a>
+                <a href="#faq">FAQ</a>
+                <a href="#feedback">Feedback</a>
+              </div>
+            </div>
+          </div>
+          <div className="footer-bottom">
+            <p>© 2024 Saber+ | Todos os direitos reservados</p>
+          </div>
+        </div>
+      </footer>
+
+      <style jsx>{`
+        .main {
+          min-height: 100vh;
+          background: linear-gradient(180deg, #f9fafb 0%, #f3f4f6 100%);
         }
-        .cabecalho {
-          background-color: white;
-          padding: 20px 40px;
-          display: flex;
-          align-items: center;
-          gap: 20px;
-          border-bottom: 1px solid #ddd;
-          box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .logo {
-          font-size: 28px;
-          font-weight: bold;
-          color: #0066cc;
-          display: flex;
-          align-items: center;
-        }
-        .icone-logo {
-          display: inline-block;
-          background: linear-gradient(135deg, #0066cc, #004999);
-          padding: 10px;
-          border-radius: 8px;
-          margin-right: 10px;
-        }
-        .caixa-busca {
-          flex: 1;
-          max-width: 500px;
-        }
-        .caixa-busca input {
-          width: 100%;
-          padding: 12px 20px;
-          border: 1px solid #ddd;
-          border-radius: 25px;
-          font-size: 14px;
-          box-sizing: border-box;
-        }
-        .caixa-busca input:focus {
-          outline: none;
-          border-color: #0066cc;
-        }
-        .usuario {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          color: #0066cc;
-          font-weight: 500;
-          cursor: pointer;
-          padding: 8px 16px;
-          border-radius: 20px;
-          transition: all 0.3s;
-        }
-        .usuario:hover {
-          background-color: #f0f7ff;
-        }
-        .icone-usuario {
-          width: 32px;
-          height: 32px;
-          background: linear-gradient(135deg, #0066cc, #004999);
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+
+        /* Hero Section */
+        .hero {
+          position: relative;
+          background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #06b6d4 100%);
           color: white;
-          font-size: 16px;
-        }
-        .conteudo {
-          padding: 40px;
-        }
-        .titulo {
-          font-size: 32px;
-          color: #0066cc;
-          margin-bottom: 20px;
-        }
-        .grade {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-          gap: 20px;
-          margin-bottom: 40px;
-        }
-        .cartao {
-          background: white;
-          border-radius: 15px;
+          padding: 6rem 0 5rem;
+          margin-bottom: 4rem;
           overflow: hidden;
-          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-          cursor: pointer;
-          transition: all 0.3s;
         }
-        .cartao:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+
+        .hero-background {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: 
+            radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+          pointer-events: none;
         }
-        .imagem-cartao {
-          height: 180px;
+
+        .hero-content {
+          position: relative;
+          z-index: 1;
+          text-align: center;
+        }
+
+        .hero-badge {
+          display: inline-block;
+          background: rgba(255, 255, 255, 0.2);
+          backdrop-filter: blur(10px);
+          padding: 0.5rem 1.25rem;
+          border-radius: 50px;
+          font-size: 0.9rem;
+          font-weight: 600;
+          margin-bottom: 1.5rem;
+          border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .hero-title {
+          font-size: 3.5rem;
+          font-weight: 800;
+          margin-bottom: 1rem;
+          letter-spacing: -0.03em;
+          text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+          animation: fadeInUp 0.8s ease-out;
+        }
+
+        .highlight {
+          background: linear-gradient(135deg, #fff 0%, #f0f9ff 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+        }
+
+        .hero-subtitle {
+          font-size: 1.35rem;
+          opacity: 0.95;
+          max-width: 700px;
+          margin: 0 auto 3rem;
+          line-height: 1.6;
+          animation: fadeInUp 0.8s ease-out 0.2s backwards;
+        }
+
+        .hero-stats {
           display: flex;
-          align-items: center;
           justify-content: center;
-          font-size: 60px;
-          color: white;
-        }
-        .matematica { background: linear-gradient(135deg, #1a4d0f, #2d5016); }
-        .quimica { background: linear-gradient(135deg, #ff8c1a, #ffaa44); }
-        .portugues { background: linear-gradient(135deg, #003366, #0052a3); }
-        .artes { background: linear-gradient(135deg, #6b8e6f, #87a988); }
-        .ingles { 
-          background: white; 
-          border-bottom: 2px solid #f0f0f0;
-          flex-direction: column;
-          gap: 10px;
-        }
-        .educacao { background: linear-gradient(135deg, #002855, #003d7a); }
-        .biologia { background: linear-gradient(135deg, #4a7c2a, #6b9d3f); }
-        .corpo-cartao {
-          padding: 20px;
-        }
-        .titulo-cartao {
-          font-size: 20px;
-          font-weight: bold;
-          margin-bottom: 10px;
-        }
-        .descricao {
-          color: #666;
-          font-size: 14px;
-          margin-bottom: 15px;
-          line-height: 1.5;
-        }
-        .rodape-cartao {
-          display: flex;
-          justify-content: space-between;
           align-items: center;
-          padding-top: 10px;
-          border-top: 1px solid #f0f0f0;
-          font-size: 12px;
+          gap: 2rem;
+          flex-wrap: wrap;
+          animation: fadeInUp 0.8s ease-out 0.4s backwards;
         }
-        .botao-adicionar {
-          background: white;
-          border: 2px solid #0066cc;
-          color: #0066cc;
-          width: 30px;
-          height: 30px;
-          border-radius: 50%;
-          cursor: pointer;
-          font-size: 18px;
-          transition: all 0.3s;
+
+        .stat-item {
+          text-align: center;
         }
-        .botao-adicionar:hover {
-          background: #0066cc;
+
+        .stat-number {
+          font-size: 2.5rem;
+          font-weight: 800;
+          margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+          font-size: 0.9rem;
+          opacity: 0.9;
+          font-weight: 500;
+        }
+
+        .stat-divider {
+          width: 1px;
+          height: 50px;
+          background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Container */
+        .container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 2rem;
+        }
+
+        /* Section */
+        .section {
+          margin-bottom: 4rem;
+        }
+
+        .section-header {
+          display: flex;
+          align-items: flex-start;
+          gap: 1.25rem;
+          margin-bottom: 2.5rem;
+        }
+
+        .section-icon {
+          font-size: 3rem;
+          line-height: 1;
+          filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        }
+
+        .section-title {
+          font-size: 2.25rem;
+          font-weight: 800;
+          color: #1f2937;
+          margin-bottom: 0.25rem;
+          letter-spacing: -0.02em;
+        }
+
+        .section-description {
+          color: #6b7280;
+          font-size: 1rem;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+          gap: 2rem;
+        }
+
+        /* Loading & Error */
+        .loading-wrapper,
+        .error-wrapper {
+          padding: 4rem 0;
+        }
+
+        /* Footer */
+        .footer {
+          background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
           color: white;
+          margin-top: 6rem;
+          padding: 3rem 0 1.5rem;
+        }
+
+        .footer-content {
+          display: grid;
+          grid-template-columns: 2fr 1fr;
+          gap: 3rem;
+          padding-bottom: 2rem;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+          margin-bottom: 1.5rem;
+        }
+
+        .footer-brand h3 {
+          font-size: 1.75rem;
+          font-weight: 700;
+          margin-bottom: 0.5rem;
+        }
+
+        .footer-brand p {
+          color: #9ca3af;
+          font-size: 0.95rem;
+        }
+
+        .footer-links {
+          display: flex;
+          gap: 3rem;
+        }
+
+        .footer-column h4 {
+          font-size: 1rem;
+          font-weight: 700;
+          margin-bottom: 1rem;
+          color: #fff;
+        }
+
+        .footer-column a {
+          display: block;
+          color: #9ca3af;
+          text-decoration: none;
+          margin-bottom: 0.75rem;
+          transition: color 0.3s;
+          font-size: 0.9rem;
+        }
+
+        .footer-column a:hover {
+          color: #06b6d4;
+        }
+
+        .footer-bottom {
+          text-align: center;
+        }
+
+        .footer-bottom p {
+          color: #6b7280;
+          font-size: 0.9rem;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+          .hero-title {
+            font-size: 2.75rem;
+          }
+
+          .cards-grid {
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+          }
+
+          .footer-content {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .hero {
+            padding: 4rem 0 3rem;
+          }
+
+          .hero-title {
+            font-size: 2.25rem;
+          }
+
+          .hero-subtitle {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+          }
+
+          .stat-number {
+            font-size: 2rem;
+          }
+
+          .section-title {
+            font-size: 1.75rem;
+          }
+
+          .section-icon {
+            font-size: 2.5rem;
+          }
+
+          .cards-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+          }
+
+          .container {
+            padding: 0 1rem;
+          }
+
+          .footer-links {
+            flex-direction: column;
+            gap: 2rem;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .hero {
+            padding: 3rem 0 2rem;
+          }
+
+          .hero-title {
+            font-size: 1.85rem;
+          }
+
+          .hero-stats {
+            gap: 1rem;
+          }
+
+          .stat-divider {
+            display: none;
+          }
         }
       `}</style>
-      
-      <div className="cabecalho">
-        <div className="logo">
-          <span className="icone-logo">📚</span>
-          Saber+
-        </div>
-        <div className="caixa-busca">
-          <input 
-            type="text" 
-            placeholder="O que está procurando?"
-            value={busca}
-            onChange={(e) => setBusca(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && buscar()}
-          />
-        </div>
-        <div className="usuario" onClick={abrirConta}>
-          <div className="icone-usuario">👤</div>
-          <span>Minha Conta</span>
-        </div>
-      </div>
-
-      <div className="conteudo">
-        <h2 className="titulo">Destaques..</h2>
-        <div className="grade">
-          
-          <div className="cartao" onClick={() => abrirMateria('Matemática')}>
-            <div className="imagem-cartao matematica">
-              ∑ π
-            </div>
-            <div className="corpo-cartao">
-              <h3 className="titulo-cartao">Matemática</h3>
-              <p className="descricao">Explore conceitos e práticas na sua jornada com da aritmética até cálculo nas suas aulas...</p>
-              <div className="rodape-cartao">
-                <span>📺 Aulas em Vídeo | 🎯 grátis</span>
-                <button className="botao-adicionar">+</button>
-              </div>
-            </div>
-          </div>
-
-          <div className="cartao" onClick={() => abrirMateria('Química')}>
-            <div className="imagem-cartao quimica">
-              ⚗️
-            </div>
-            <div className="corpo-cartao">
-              <h3 className="titulo-cartao">Química</h3>
-              <p className="descricao">Explore dos elementos naturais e sintéticas nas suas composições...</p>
-              <div className="rodape-cartao">
-                <span>📺 Aulas em Vídeo | 🎯 grátis</span>
-                <button className="botao-adicionar">+</button>
-              </div>
-            </div>
-          </div>
-
-          <div className="cartao" onClick={() => abrirMateria('Português')}>
-            <div className="imagem-cartao portugues">
-              PT
-            </div>
-            <div className="corpo-cartao">
-              <h3 className="titulo-cartao">Português</h3>
-              <p className="descricao">Interpretação de textos para uso escrito e oral, enriquecendo e...</p>
-              <div className="rodape-cartao">
-                <span>📺 Aulas em Vídeo | 🎯 grátis</span>
-                <button className="botao-adicionar">+</button>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <h2 className="titulo">Veja Também..</h2>
-        <div className="grade">
-          
-          <div className="cartao" onClick={() => abrirMateria('Artes')}>
-            <div className="imagem-cartao artes">
-              🎨
-            </div>
-            <div className="corpo-cartao">
-              <h3 className="titulo-cartao">Artes</h3>
-              <p className="descricao">Explore diversas atividades sobre teoria das cores, composição, perspectiva e...</p>
-              <div className="rodape-cartao">
-                <span>📺 Aulas em Vídeo | 🎯 grátis</span>
-                <button className="botao-adicionar">+</button>
-              </div>
-            </div>
-          </div>
-
-          <div className="cartao" onClick={() => abrirMateria('Inglês')}>
-            <div className="imagem-cartao ingles">
-              <div>🇬🇧</div>
-              <div style={{color: '#333', fontSize: '20px'}}>❤️ ENGLISH</div>
-            </div>
-            <div className="corpo-cartao">
-              <h3 className="titulo-cartao">Inglês</h3>
-              <p className="descricao">Aprenda gramática, vocabulário, e leitura. Tudo o que você precisa para dominar...</p>
-              <div className="rodape-cartao">
-                <span>📺 Aulas em Vídeo | 🎯 grátis</span>
-                <button className="botao-adicionar">+</button>
-              </div>
-            </div>
-          </div>
-
-          <div className="cartao" onClick={() => abrirMateria('Educação Física')}>
-            <div className="imagem-cartao educacao">
-              ⛹️
-            </div>
-            <div className="corpo-cartao">
-              <h3 className="titulo-cartao">Educação Física</h3>
-              <p className="descricao">Teoria e prática em esportes, nutrição e importância da atividade física...</p>
-              <div className="rodape-cartao">
-                <span>📺 Aulas em Vídeo | 🎯 grátis</span>
-                <button className="botao-adicionar">+</button>
-              </div>
-            </div>
-          </div>
-
-          <div className="cartao" onClick={() => abrirMateria('Biologia')}>
-            <div className="imagem-cartao biologia">
-              🧬 🌍
-            </div>
-            <div className="corpo-cartao">
-              <h3 className="titulo-cartao">Biologia</h3>
-              <p className="descricao">Estude sobre a vida de seres vivos da estrutura da célula até ecossistemas...</p>
-              <div className="rodape-cartao">
-                <span>📺 Aulas em Vídeo | 🎯 grátis</span>
-                <button className="botao-adicionar">+</button>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
+    </>
   );
 }
