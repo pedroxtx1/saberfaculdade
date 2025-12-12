@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 export default function SaberPlus() {
   const [busca, setBusca] = useState('');
-  const [telaAtual, setTelaAtual] = useState('home'); // 'home' ou nome da matéria
+  const [telaAtual, setTelaAtual] = useState('home'); // 'home', 'materia' ou 'conta'
   const [materiaAtual, setMateriaAtual] = useState(null);
 
   // Dados das matérias com vídeos e livros
@@ -117,10 +117,201 @@ export default function SaberPlus() {
     setMateriaAtual(null);
   }
 
+  function abrirConta() {
+    setTelaAtual('conta');
+  }
+
   function buscar() {
     if (busca) {
       alert('Buscando: ' + busca);
     }
+  }
+
+  // TELA MINHA CONTA
+  if (telaAtual === 'conta') {
+    return (
+      <div>
+        <style jsx global>{`
+          body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #fafafa;
+          }
+          .tela-conta {
+            min-height: 100vh;
+            background-color: #fafafa;
+          }
+          .cabecalho-conta {
+            background-color: white;
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border-bottom: 1px solid #ddd;
+          }
+          .botao-voltar {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #0066cc;
+          }
+          .logo-pequeno {
+            font-size: 20px;
+            font-weight: bold;
+            color: #0066cc;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          }
+          .titulo-materia {
+            font-size: 28px;
+            font-weight: bold;
+            color: #0066cc;
+            margin-left: auto;
+          }
+          .container-conta {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+          }
+          .card-perfil {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+          }
+          .foto-perfil-grande {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #0066cc, #004999);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            color: white;
+            margin: 0 auto 20px;
+          }
+          .nome-usuario {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 5px;
+            font-weight: bold;
+          }
+          .email-usuario {
+            color: #666;
+            font-size: 16px;
+          }
+          .card-info {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+          }
+          .titulo-secao-conta {
+            font-size: 20px;
+            color: #0066cc;
+            margin-bottom: 20px;
+            font-weight: bold;
+          }
+          .item-info {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+          }
+          .item-info:last-child {
+            border-bottom: none;
+          }
+          .label-info {
+            color: #666;
+            font-weight: 500;
+          }
+          .valor-info {
+            color: #333;
+            font-weight: bold;
+          }
+          .botao-sair {
+            width: 100%;
+            padding: 15px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+          }
+          .botao-sair:hover {
+            background: #cc0000;
+            transform: translateY(-2px);
+          }
+        `}</style>
+
+        <div className="tela-conta">
+          <div className="cabecalho-conta">
+            <button className="botao-voltar" onClick={voltarHome}>
+              ← 
+            </button>
+            <div className="logo-pequeno">
+              📚 Saber+
+            </div>
+            <div className="titulo-materia">
+              Minha Conta
+            </div>
+          </div>
+
+          <div className="container-conta">
+            <div className="card-perfil">
+              <div className="foto-perfil-grande">👤</div>
+              <h2 className="nome-usuario">Pedro Silva</h2>
+              <p className="email-usuario">pedro.silva@email.com</p>
+            </div>
+
+            <div className="card-info">
+              <h3 className="titulo-secao-conta">Informações Pessoais</h3>
+              <div className="item-info">
+                <span className="label-info">Nome Completo</span>
+                <span className="valor-info">Pedro Silva</span>
+              </div>
+              <div className="item-info">
+                <span className="label-info">Email</span>
+                <span className="valor-info">pedro.silva@email.com</span>
+              </div>
+              <div className="item-info">
+                <span className="label-info">Série</span>
+                <span className="valor-info">3º Ano - Ensino Médio</span>
+              </div>
+              <div className="item-info">
+                <span className="label-info">Escola</span>
+                <span className="valor-info">Colégio Estadual</span>
+              </div>
+            </div>
+
+            <div className="card-info">
+              <h3 className="titulo-secao-conta">Estatísticas</h3>
+              <div className="item-info">
+                <span className="label-info">Vídeos Assistidos</span>
+                <span className="valor-info">42</span>
+              </div>
+              <div className="item-info">
+                <span className="label-info">Livros Lidos</span>
+                <span className="valor-info">15</span>
+              </div>
+            </div>
+
+            <button className="botao-sair" onClick={() => alert('Saindo da conta...')}>
+              Sair da Conta
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   // TELA DA MATÉRIA (como a imagem que você mostrou)
@@ -497,7 +688,7 @@ export default function SaberPlus() {
             onKeyPress={(e) => e.key === 'Enter' && buscar()}
           />
         </div>
-        <div className="usuario">
+        <div className="usuario" onClick={abrirConta}>
           <div className="icone-usuario">👤</div>
           <span>Minha Conta</span>
         </div>
